@@ -8,17 +8,21 @@ import (
 // QuestionsMarks ..
 func QuestionsMarks(str string) string {
 
+	questionsMarks := 0
 	for i := 0; i < len(str); i++ {
 		if isNumeric(str[i : i+1]) {
-			count := 1
-			for j := i + 1; j < len(str); j++ {
-				if str[j:j+1] != "?" && count < 3 && isNumeric(str[j:j+1]) {
-					return "false"
+
+			for j := i + 1; j < i+3; j++ {
+				if str[j:j+1] == "?" {
+					questionsMarks++
+				} else {
+					return ""
 				}
-				count++
 			}
 		}
+
 	}
+
 	return "true"
 
 }
@@ -29,8 +33,6 @@ func isNumeric(s string) bool {
 
 func main() {
 
-	// do not modify below here, readline is our function
-	// that properly reads in the input for you
-	fmt.Println(QuestionsMarks("aa6?9"))
+	fmt.Println(QuestionsMarks("9???1???9???1???9"))
 
 }
