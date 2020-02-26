@@ -1,1 +1,1 @@
-# golang-angorith-samples
+# golang-algorith-samples
