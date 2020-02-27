@@ -13,80 +13,75 @@ func readEntries(n int32) ([]int32, error) {
 	return in, nil
 }
 
-func findDeepestMud(arr [][]int32) int32 {
-	revArr:=reverseArray(arr)
+func findDeepestMud(arr [][]int32, r int32, c int32) int32 {
+	var path []int32
+	var totalPaths [][]int32
 	var deepestMud int32 = 0
-	jmud := 0
-	var mudArr []int32
-	for i := 0; i < len(revArr); i++ {
-		var mud int32 = 0
-		if i == 0 {
-			fmt.Println("jmud1:", jmud)
-			mud = revArr[i][0]
-		} else {
-			fmt.Println("jmud1:", jmud)
-			mud = revArr[i][jmud]
-		}
-		for j := 0; j < len(revArr[i]); j++ {
-			if i == 0 {
-				if revArr[i][j] < mud {
-					mud = revArr[i][j]
-					fmt.Println("mud5", mud)
-					jmud = j
-				}
-				fmt.Println("jmud1:", jmud)
-				fmt.Println("-------")
+	var i, j int32 = 0, 0
+
+	for i = 0; i < c; i++ {
+		for j = 0; j < r; j++ {
+			if j == 0 {
+				path = append(path, arr[i][j])
 			} else {
-				fmt.Printf("jmud+1:%v ,jmud-1:%v ,j:%v", jmud+1, jmud-1, j)
-				fmt.Println("")
-				if j != jmud+1 && j != jmud-1 {
-					fmt.Println("geldi")
-					if revArr[i][j] < mud {
-						mud = revArr[i][j]
-						fmt.Println("mud3", mud)
-						jmud = j
+				var mud int32 = arr[i][0]
+				if isValid(i, j-1, r, c) {
+					if arr[i][j-1] < mud {
+						mud = arr[i][j-1]
 					}
 				}
-				fmt.Println("-------")
-
+				if isValid(i-1, j, r, c) {
+					if arr[i-1][j] < mud {
+						mud = arr[i-1][j]
+					}
+				}
+				if isValid(i, j+1, r, c) {
+					if arr[i][j+1] < mud {
+						mud = arr[i][j+1]
+					}
+				}
+				if isValid(i+1, j, r, c) {
+					if arr[i+1][j] < mud {
+						mud = arr[i+1][j]
+					}
+				}
+				path = append(path, mud)
 			}
 		}
-		fmt.Println("mudlast", mud)
-		mudArr = append(mudArr, mud)
+		totalPaths = append(totalPaths, path)
 	}
-	fmt.Println(mudArr)
-	for _, mud := range mudArr {
-		if mud > deepestMud {
-			deepestMud = mud
+
+	if j == c {
+		for _, mud := range path {
+			if mud > deepestMud {
+				deepestMud = mud
+			}
 		}
 	}
 	return deepestMud
 }
 
-func reverseArray(arr [][]int32) [][]int32 {
+func isValid(i int32, j int32, r int32, c int32) bool {
 
-	var twoD [][]int32
-	for i := 0; i < len(arr[0]); i++ {
-		var oneD []int32
-		for j := 0; j < len(arr); j++ {
-			oneD = append(oneD, arr[j][i])
-		}
-		twoD = append(twoD, oneD)
+	if (i >= 0 && i < r) && (j >= 0 && j < c) {
+		return true
 	}
-	return twoD
+	return false
 }
 func main() {
 
-	var r, c, i int32
-	var arr [][]int32
-	fmt.Scanf("%d%d", &r, &c)
-	for i = 0; i < r; i++ {
-		test, err := readEntries(c)
-		if err != nil {
-			break
-		}
-		arr = append(arr, test)
-	}
-	fmt.Println(findDeepestMud(arr))
+	// var r, c, i int32
+	// var arr [][]int32
+	// fmt.Scanf("%d%d", &r, &c)
+	// for i = 0; i < r; i++ {
+	// 	test, err := readEntries(c)
+	// 	if err != nil {
+	// 		break
+	// 	}
+	// 	arr = append(arr, test)
+	// }
+	var r, c int32 = 5, 4
+	arr := [][]int32{{2, 1, 0, 8}, {3, 7, 3, 5}, {3, 1, 2, 4}, {9, 0, 4, 6}, {5, 3, 2, 3}}
+	fmt.Println(findDeepestMud(arr, r, c))
 
 }
