@@ -23,7 +23,7 @@ func readEntries(n int32) ([]int32, error) {
 func findDeepestMud(r int32, c int32) int32 {
 
 	var deepestMud, xi, xj int32 = 0, 0, 0
-	if j == 0 {
+	if j == 0 && isVisited(arrVisit, i, j) {
 		j = findSmallest(arr[0])
 		visit := fmt.Sprint(i) + "," + fmt.Sprint(j)
 		arrVisit = append(arrVisit, visit)
@@ -31,7 +31,6 @@ func findDeepestMud(r int32, c int32) int32 {
 	} else {
 		var mud int32 = 0
 		if isValid(i, j-1, r, c) && isVisited(arrVisit, i, j-1) {
-			fmt.Println(arr[i][j-1])
 			if mud == 0 && arr[i][j-1] > 0 {
 				mud = arr[i][j-1]
 				xi = i
@@ -43,39 +42,36 @@ func findDeepestMud(r int32, c int32) int32 {
 			}
 		}
 		if isValid(i-1, j, r, c) && isVisited(arrVisit, i-1, j) {
-			fmt.Println(arr[i-1][j])
-			if mud == 0 && arr[i][j-1] > 0 {
-				mud = arr[i][j-1]
-				xi = i
-				xj = j - 1
+			if mud == 0 && arr[i-1][j] > 0 {
+				mud = arr[i-1][j]
+				xi = i - 1
+				xj = j
 			} else if arr[i-1][j] <= mud {
-				mud = arr[i][j-1]
-				xi = i
-				xj = j - 1
+				mud = arr[i-1][j]
+				xi = i - 1
+				xj = j
 			}
 		}
 		if isValid(i, j+1, r, c) && isVisited(arrVisit, i, j+1) {
-			fmt.Println(arr[i][j+1])
-			if mud == 0 && arr[i][j-1] > 0 {
-				mud = arr[i][j-1]
+			if mud == 0 && arr[i][j+1] > 0 {
+				mud = arr[i][j+1]
 				xi = i
-				xj = j - 1
-			} else if arr[i-1][j] <= mud {
-				mud = arr[i][j-1]
+				xj = j + 1
+			} else if arr[i][j+1] <= mud {
+				mud = arr[i][j+1]
 				xi = i
-				xj = j - 1
+				xj = j + 1
 			}
 		}
 		if isValid(i+1, j, r, c) && isVisited(arrVisit, i+1, j) {
-			fmt.Println(arr[i+1][j])
-			if mud == 0 && arr[i][j-1] > 0 {
-				mud = arr[i][j-1]
-				xi = i
-				xj = j - 1
-			} else if arr[i-1][j] <= mud {
-				mud = arr[i][j-1]
-				xi = i
-				xj = j - 1
+			if mud == 0 && arr[i+1][j] > 0 {
+				mud = arr[i+1][j]
+				xi = i + 1
+				xj = j
+			} else if arr[i+1][j] <= mud {
+				mud = arr[i+1][j]
+				xi = i + 1
+				xj = j
 			}
 		}
 		i = xi
@@ -85,7 +81,7 @@ func findDeepestMud(r int32, c int32) int32 {
 		path = append(path, mud)
 	}
 
-	if j == c {
+	if j == r-1 && i == c-1 {
 		for _, mud := range path {
 			if mud > deepestMud {
 				deepestMud = mud
@@ -99,7 +95,7 @@ func findDeepestMud(r int32, c int32) int32 {
 
 func isValid(i int32, j int32, r int32, c int32) bool {
 
-	if (i >= 0 && i < r) && (j >= 0 && j < c) {
+	if (i >= 0 && i < c) && (j >= 0 && j < r) {
 		return true
 	}
 	return false
@@ -138,19 +134,17 @@ func reverseArray(arr [][]int32) [][]int32 {
 }
 func main() {
 
-	// var r, c, i int32
-	// var arr [][]int32
-	// fmt.Scanf("%d%d", &r, &c)
-	// for i = 0; i < r; i++ {
-	// 	test, err := readEntries(c)
-	// 	if err != nil {
-	// 		break
-	// 	}
-	// 	arr = append(arr, test)
-	// }
-
-	var r, c int32 = 5, 4
-	arr = reverseArray([][]int32{{2, 1, 0, 8}, {1, 7, 3, 5}, {3, 1, 2, 4}, {9, 0, 4, 6}, {5, 3, 2, 3}})
+	var r, c, i int32
+	var tempArr [][]int32
+	fmt.Scanf("%d%d", &r, &c)
+	for i = 0; i < r; i++ {
+		test, err := readEntries(c)
+		if err != nil {
+			break
+		}
+		tempArr = append(tempArr, test)
+	}
+	arr = reverseArray(tempArr)
 	fmt.Println(findDeepestMud(r, c))
 
 }
