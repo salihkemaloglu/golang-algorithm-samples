@@ -17,6 +17,7 @@ func readEntries(n int32) ([]int32, error) {
 
 var multiPaths []string
 var isMultiPath bool
+var multiPathCount int32 = 0
 
 func findDeepestMud(r int32, c int32, i int32, j int32, arr [][]int32, path []int32, arrVisit []string) []int32 {
 
@@ -24,7 +25,7 @@ func findDeepestMud(r int32, c int32, i int32, j int32, arr [][]int32, path []in
 	var paths []int32
 	var check bool = true
 
-	//up
+	//left
 	if isValid(i-1, j, r, c) && isVisited(arrVisit, i-1, j) && isVisited(multiPaths, i-1, j) {
 		if check && arr[i-1][j] >= 0 {
 			mud = arr[i-1][j]
@@ -108,7 +109,10 @@ func findMultiPathCount(paths []int32, mud int32) bool {
 			count++
 		}
 	}
-	return count >= 2
+	if count >= 2 && count <= multiPathCount {
+		return true
+	}
+	return false
 }
 
 func isValid(i int32, j int32, r int32, c int32) bool {
@@ -180,11 +184,11 @@ func main() {
 	for j = 0; j < int32(len(arr[0])); j++ {
 		if arr[0][j] <= smalletsMud {
 			isMultiPath = false
-			visit := fmt.Sprint(0) + "," + fmt.Sprint(indexj)
+			multiPathCount = 0
+			visit := fmt.Sprint(0) + "," + fmt.Sprint(j)
 			arrVisited := []string{visit}
 			path := []int32{arr[0][j]}
 			path = append(path, findDeepestMud(r, c, 0, j, arr, []int32{}, arrVisited)...)
-			fmt.Println(path)
 			mud, totalMudPath, totalCount := findTotalMudPath(path)
 			if check {
 				minMudPath = totalMudPath
@@ -200,6 +204,8 @@ func main() {
 			}
 			if isMultiPath {
 				j--
+			} else {
+				multiPaths = nil
 			}
 		}
 	}
