@@ -18,13 +18,6 @@ func readEntries(n int32) ([]int32, error) {
 
 var multiPaths []string
 var isMultiPath bool
-var isParent bool = false
-var isMultiPathCount int32 = 0
-
-type point struct {
-	xi int32
-	ji int32
-}
 
 func findDeepestMud(r int32, c int32, i int32, j int32, arr [][]int32, path []int32, arrVisit []string) []int32 {
 
@@ -100,34 +93,49 @@ func findDeepestMud(r int32, c int32, i int32, j int32, arr [][]int32, path []in
 			count++
 		}
 	}
-	i = xi
-	j = xj
 
-	if findMultiPathCount(paths, mud) && isMultipathVisited(i, j) {
-		isMultiPathCount++
-		if isMultiPathCount > 1 {
-			makeNoneVisited()
-		}
-		visit := fmt.Sprint(i) + "," + fmt.Sprint(j) + ":" + "1"
-		multiPaths = append(multiPaths, visit)
-		isMultiPath = true
-
-	}
-	visit := fmt.Sprint(i) + "," + fmt.Sprint(j)
+	visit := fmt.Sprint(xi) + "," + fmt.Sprint(xj)
 	arrVisit = append(arrVisit, visit)
-
 	path = append(path, mud)
-	if i == c-1 {
+	if findMultiPathCount(paths, mud) && isMultipathVisited(xi, xj) {
+		makeNoneVisited(arrVisit)
+		if !isMultipathExcistThanUpdate(xi, xj) {
+			visit := fmt.Sprint(xi) + "," + fmt.Sprint(xj) + ":" + "1"
+			multiPaths = append(multiPaths, visit)
+		}
+
+		isMultiPath = true
+	}
+
+	if xi == c-1 {
 		return path
-	} else if i == 0 && j == 0 && count == 0 {
+	} else if xi == 0 && xj == 0 && count == 0 {
 		return nil
 	}
 
-	return findDeepestMud(r, c, i, j, arr, path, arrVisit)
+	return findDeepestMud(r, c, xi, xj, arr, path, arrVisit)
 }
-func makeNoneVisited() {
+func isMultipathExcistThanUpdate(i int32, j int32) bool {
+	visit := fmt.Sprint(i) + "," + fmt.Sprint(j)
 	for i := 0; i < len(multiPaths); i++ {
 		arr := strings.Split(multiPaths[i], ":")
+		if arr[0] == visit && arr[1] == "0" {
+			visit := arr[0] + ":" + "1"
+			multiPaths[i] = visit
+			return true
+		}
+	}
+	return false
+}
+func makeNoneVisited(arrVisit []string) {
+	for i := 0; i < len(multiPaths); i++ {
+		arr := strings.Split(multiPaths[i], ":")
+		for j := 0; j < len(arrVisit); j++ {
+			if arr[0] == arrVisit[j] && arr[1] == "1" {
+				visit := arr[0] + ":" + "0"
+				multiPaths[i] = visit
+			}
+		}
 
 	}
 }
@@ -156,7 +164,9 @@ func isMultipathVisited(i int32, j int32) bool {
 	visit := fmt.Sprint(i) + "," + fmt.Sprint(j)
 	for i := 0; i < len(multiPaths); i++ {
 		arr := strings.Split(multiPaths[i], ":")
-
+		if arr[0] == visit && arr[1] == "1" {
+			return false
+		}
 	}
 	return true
 }
@@ -204,23 +214,16 @@ func findTotalMudPath(path []int32) (int32, int32, int32) {
 }
 func main() {
 
-	// var r, c, i int32
-	// var tempArr [][]int32
-	// fmt.Scanf("%d%d", &r, &c)
-	// for i = 0; i < r; i++ {
-	// 	test, err := readEntries(c)
-	// 	if err != nil {
-	// 		break
-	// 	}
-	// 	tempArr = append(tempArr, test)
-	// }
-	var r, c int32 = 5, 4
-	tempArr := [][]int32{
-		{3, 1, 0, 3},
-		{3, 2, 3, 5},
-		{2, 1, 2, 0},
-		{9, 2, 4, 6},
-		{5, 3, 2, 3}}
+	var r, c, i int32
+	var tempArr [][]int32
+	fmt.Scanf("%d%d", &r, &c)
+	for i = 0; i < r; i++ {
+		test, err := readEntries(c)
+		if err != nil {
+			break
+		}
+		tempArr = append(tempArr, test)
+	}
 	arr := reverseArray(tempArr)
 	var j, minMudPath, deepestMud, count int32 = 0, 0, 0, 0
 	check := true
@@ -233,7 +236,6 @@ func main() {
 			arrVisited := []string{visit}
 			path := []int32{arr[0][j]}
 			path = append(path, findDeepestMud(r, c, 0, j, arr, []int32{}, arrVisited)...)
-			fmt.Println(path)
 			if len(path) > 1 {
 				mud, totalMudPath, totalCount := findTotalMudPath(path)
 				if check {
